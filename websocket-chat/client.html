@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WebSocket Chat Client</title>
+</head>
+<body>
+  <h1>WebSocket Chat</h1>
+  <input id="messageInput" type="text" placeholder="Ketik pesan...">
+  <button onclick="sendMessage()">Kirim</button>
+
+  <ul id="messages"></ul>
+
+  <script>
+    const socket = new WebSocket('ws://localhost:8080');
+
+    socket.addEventListener('open', function (event) {
+      console.log('Terhubung ke server!');
+    });
+
+    socket.addEventListener('message', async function (event) {
+    const messages = document.getElementById('messages');
+    const li = document.createElement('li');
+
+    if (event.data instanceof Blob) {
+        // Jika event.data adalah Blob, baca isinya
+        const text = await event.data.text();
+        li.textContent = text;
+    } else {
+        li.textContent = event.data;
+    }
+
+    messages.appendChild(li);
+    });
+
+
+    function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const message = input.value;
+      socket.send(message);
+      input.value = '';
+    }
+  </script>
+</body>
+</html>
